@@ -11,7 +11,7 @@ app.use(express.static('dist'))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
 
 function getNewID() {
-  return Math.floor(Math.random() * 1000000);
+  return Math.floor(Math.random() * 1000000).toString();
 }
 
 let persons = [
@@ -61,9 +61,15 @@ app.post('/api/persons', (request, response) => {
   } else if (persons.find(p => p.name === person.name)) {
     response.status(400).end("{ error: 'name must be unique' }")
   } else {
-    person.id = getNewID()
-    persons = persons.concat(person)
-    response.status(204).end()
+    //person.id = getNewID()
+    //console.log(person.id)
+    const newperson = {
+      name: person.name,
+      number: person.number,
+      id: getNewID()
+    }
+    persons = persons.concat(newperson)
+    response.json(newperson)
   }
   
 })
