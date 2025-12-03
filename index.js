@@ -5,7 +5,7 @@ const morgan = require('morgan')
 const Person = require('./models/person')
 require('dotenv').config()
 
-morgan.token('data', function (req, res) {
+morgan.token('data', function (req) {
   return JSON.stringify(req.body)
 })
 
@@ -18,16 +18,16 @@ app.get('/api/persons/:id', (request, response, next) => {
     if (person) {
       response.json(person)
     } else {
-      response.statusMessage = "Could not find the person with the specified id"
+      response.statusMessage = 'Could not find the person with the specified id'
       response.status(404).end()
     }
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then(result => {
+    .then(() => { // had result =>
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -35,9 +35,7 @@ app.delete('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response, next) => {
   let person = request.body
-  if (!(person.name && person.number)) {
-    response.status(400).end("{ error: 'entry must include a name' }")
-  } 
+
   const newperson = new Person({
     name: person.name,
     number: person.number,
@@ -70,7 +68,7 @@ app.put('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-app.get('/info', (request, response) => {  
+app.get('/info', (request, response, next) => {
   Person.countDocuments({})
     .then(num => {
       response.send(`<p>Phonebook has info for ${num} people</p><p>${new Date()}</p>`)
